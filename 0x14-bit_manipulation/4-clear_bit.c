@@ -7,6 +7,7 @@
  *
  * Return: 1 for success, -1 for failure
  */
+
 int clear_bit(unsigned long int *n, unsigned int index)
 {
 	/** Check if index is greater than 63, which is the maximum number of bits */
