@@ -1,55 +1,33 @@
 #include "main.h"
-#include <stdlib.h>
 
 /**
- * read_textfile - Reads a text file and prints its contents to STDOUT.
- * @filename: The name of the text file to read.
- * @letters: The maximum number of letters to read and print.
+ * read_textfile - reads a text file and prints it to the POSIX standard output
+ * @filename: name of the file to read
+ * @letters: number of letters it should read and print
  *
- * Return: The number of bytes that were read and printed, or 0 if an error
- * occurred or if filename is NULL.
+ * Return: actual number of letters it could read and print, 0 otherwise
  */
 ssize_t read_textfile(const char *filename, size_t letters)
 {
-    char *buffer;
-    ssize_t file_descriptor, bytes_read, bytes_written, total_bytes_written;
+	ssize_t n_read, n_written;
+	char *buff;
+	int f;
 
-    if (filename == NULL)
-        return (0);
-
-    file_descriptor = open(filename, O_RDONLY);
-    if (file_descriptor == -1)
-        return (0);
-
-    buffer = malloc(sizeof(char) * letters);
-    if (buffer == NULL)
-    {
-        close(file_descriptor);
-        return (0);
-    }
-
-    bytes_read = read(file_descriptor, buffer, letters);
-    total_bytes_written = 0;
-
-    while (bytes_read > 0 && total_bytes_written < bytes_read)
-    {
-        bytes_written = write(STDOUT_FILENO, buffer + total_bytes_written,
-                              bytes_read - total_bytes_written);
-        if (bytes_written == -1)
-        {
-            free(buffer);
-            close(file_descriptor);
-            return (0);
-        }
-        total_bytes_written += bytes_written;
-    }
-
-    free(buffer);
-    close(file_descriptor);
-
-    if (bytes_read == -1 || total_bytes_written < bytes_read)
-        return (0);
-
-    return (total_bytes_written);
+	if (filename == NULL)
+		return (0);
+	f = open(filename, O_RDONLY);
+	if (f == -1)
+		return (0);
+	buff = malloc(sizeof(char) * letters);
+	if (buff == NULL)
+		return (0);
+	n_read = read(f, buff, letters);
+	if (n_read == -1)
+		return (0);
+	n_written = write(STDOUT_FILENO, buff, n_read);
+	free(buff);
+	close(f);
+	if (n_written == -1 || n_written != n_read)
+		return (0);
+	return (n_written);
 }
-
